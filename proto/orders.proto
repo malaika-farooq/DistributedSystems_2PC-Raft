@@ -1,0 +1,15 @@
+syntax = "proto3";
+package orders;
+
+service OrdersService {
+  rpc PlaceOrder (PlaceOrderRequest) returns (PlaceOrderResponse);
+}
+
+message PlaceOrderRequest {
+  string user_id = 1;
+}
+
+message PlaceOrderResponse {
+  bool ok = 1;
+  string message = 2;
+}

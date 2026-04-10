@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+
+{% block title %}ServerShop | Products{% endblock %}
+{% block left %} {% include "_toolbar.html" %} {% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/products.js') }}"></script>{% endblock %}

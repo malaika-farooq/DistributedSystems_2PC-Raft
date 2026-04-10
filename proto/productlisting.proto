@@ -1,0 +1,37 @@
+syntax = "proto3";
+package productlisting;
+
+service ProductListingService {
+  rpc ListItems (ListItemsRequest) returns (ListItemsResponse);
+  rpc GetItem (GetItemRequest) returns (GetItemResponse);
+}
+
+message Item {
+  int32 id = 1;
+  string title = 2;
+  double price = 3;
+  string image_url = 4;
+  bool is_featured = 5;
+  string type = 6;
+}
+
+message ListItemsRequest {
+  string sort = 1;
+  bool featured_only = 2;
+  string type = 3; // 👈 NEW
+  int32 limit = 4;
+  int32 offset = 5;
+}
+
+message ListItemsResponse {
+  repeated Item items = 1;
+}
+
+message GetItemRequest {
+  int32 id = 1;
+}
+
+message GetItemResponse {
+  bool found = 1;
+  Item item = 2;
+}

@@ -1,0 +1,58 @@
+syntax = "proto3";
+package usercarts;
+service UserCartsService {
+  rpc AddToCart (AddToCartRequest) returns (AddToCartResponse);
+  rpc GetCart (GetCartRequest) returns (GetCartResponse);
+  rpc ClearCart (ClearCartRequest) returns (ClearCartResponse);
+  rpc RemoveFromCart (RemoveFromCartRequest) returns (RemoveFromCartResponse);
+}
+
+message ClearCartRequest {
+  string user_id = 1;
+}
+
+message ClearCartResponse {
+  bool ok = 1;
+  string message = 2;
+}
+
+message AddToCartRequest {
+  string user_id = 1;
+  int32 item_id = 2;
+  int32 quantity = 3;
+}
+
+message AddToCartResponse {
+  bool ok = 1;
+  string message = 2;
+}
+
+message CartItem {
+  int32 item_id = 1;
+  int32 quantity = 2;
+}
+
+message GetCartRequest {
+  string user_id = 1;
+}
+
+message GetCartResponse {
+  repeated CartItem items = 1;
+}
+
+message RemoveFromCartRequest {
+  string user_id = 1;
+  int32 item_id = 2;
+
+  // If remove_all is true, ignore quantity and remove the row.
+  bool remove_all = 3;
+
+  // If remove_all is false, subtract this amount (must be >= 1).
+  int32 quantity = 4;
+}
+
+message RemoveFromCartResponse {
+  bool ok = 1;
+  string message = 2;
+  int32 new_quantity = 3; // 0 if removed
+}

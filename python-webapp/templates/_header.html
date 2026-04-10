@@ -1,0 +1,37 @@
+    <div class="header">
+      <a href="/"><h1>ServerShop</h1></a>
+
+      {% if session.get('user') %}
+        <div class="headerright">
+            <div class="navbar">
+                <a href="/"><h3>Home</h3></a>
+                <a href="/products"><h3>Products</h3></a>
+                <a href="/cart"><h3>Cart</h3></a>
+            </div>
+            <div class="user-area">
+            <span>Hi, {{ session['user'] }}</span>
+            <form method="post" action="{{ url_for('logout') }}">
+                <input type="submit" value="Logout">
+            </form>
+            </div>
+        </div>
+      {% else %}
+        <div class="headerright">
+            <div class="navbar">
+                <a href="/"><h3>Home</h3></a>
+                <a href="/products"><h3>Products</h3></a>
+            </div>
+            <form method="post" action="{{ url_for('login') }}">
+            <label for="user">Username:</label>
+            <input type="text" id="user" name="user">
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password">
+
+            <input type="submit" value="Login">
+            </form>
+            <button onclick="window.location.href='/register'">Register</button>
+        </div>
+        
+      {% endif %}
+    </div>

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+
+{% block title %}ServerShop | Cart{% endblock %}
+{% block content %} {% include "_cartview.html" %} {% endblock %}
+{% block left %} {% include "_productlist.html" %} {% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/cart.js') }}"></script>{% endblock %}

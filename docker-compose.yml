@@ -1,0 +1,180 @@
+# ══════════════════════════════════════════════════════════════════════
+#  2PC Cluster — 5 nodes total (1 coordinator + 4 participants)
+#
+#  Node 1: coordinator              (microservice-2pc-coordinator)
+#  Node 2: participant-1 / orders   (microservice-orders)
+#  Node 3: participant-2 / carts    (participant-carts)
+#  Node 4: participant-3            (participant-3)
+#  Node 5: participant-4            (participant-4)
+#
+#  Each participant runs TWO gRPC servers inside the same container:
+#    - Voting phase server  (handles RequestVote / Commit / Abort from coordinator)
+#    - Decision phase server (handles DoCommit / DoAbort from voting phase)
+#  The voting phase calls the decision phase via intra-node gRPC (localhost).
+# ══════════════════════════════════════════════════════════════════════
+
+services:
+  # ── Application services (unchanged from original) ──────────────────
+  microservice-userauth:
+    build:
+      context: .
+      dockerfile: microservice-userauth/Dockerfile
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./auth_data:/data
+    environment:
+      - DB_PATH=/data/users.db
+      - SEED_USER=admin
+      - SEED_PASS=admin123
+
+  microservice-productlisting:
+    build:
+      context: .
+      dockerfile: microservice-productlisting/Dockerfile
+    expose:
+      - "50052"
+    volumes:
+      - ./productlisting_data:/data
+    environment:
+      - DB_PATH=/data/products.db
+
+  microservice-usercarts:
+    build:
+      context: .
+      dockerfile: microservice-usercarts/Dockerfile
+    expose:
+      - "50053"
+    volumes:
+      - ./carts_data:/data
+    environment:
+      - DB_PATH=/data/carts.db
+
+  microservice-admin:
+    build:
+      context: .
+      dockerfile: microservice-admin/Dockerfile
+    expose:
+      - "50055"
+    volumes:
+      - ./productlisting_data:/data
+    environment:
+      - DB_PATH=/data/products.db
+
+  microservice-images:
+    image: nginx:alpine
+    expose:
+      - "80"
+    volumes:
+      - ./images:/usr/share/nginx/html:ro
+
+  # ── 2PC Node 1: COORDINATOR ─────────────────────────────────────────
+  # Drives the entire 2PC protocol.
+  # Sends VoteRequest to all 4 participants, collects votes,
+  # then sends global Commit or Abort.
+  microservice-2pc-coordinator:
+    build:
+      context: .
+      dockerfile: microservice-2pc-coordinator/Dockerfile
+    expose:
+      - "50060"
+    environment:
+      - NODE_ID=coordinator
+      - PARTICIPANT_ADDRS=microservice-orders:50056,participant-carts:50062,participant-3:50064,participant-4:50066
+    depends_on:
+      - microservice-orders
+      - participant-carts
+      - participant-3
+      - participant-4
+
+  # ── 2PC Node 2: PARTICIPANT — Orders ────────────────────────────────
+  # Voting phase  (port 50056): receives RequestVote/Commit/Abort from coordinator
+  # Decision phase (port 50057): receives DoCommit/DoAbort from voting phase
+  # Local action on COMMIT: save order record to SQLite DB
+  # Local action on ABORT:  do nothing (no order saved)
+  microservice-orders:
+    build:
+      context: .
+      dockerfile: microservice-orders/Dockerfile
+    expose:
+      - "50054"   # original OrdersService (webapp calls this)
+      - "50056"   # 2PC voting phase
+      - "50057"   # 2PC decision phase (intra-node)
+    volumes:
+      - ./orders_data:/data
+    environment:
+      - CARTS_GRPC_TARGET=microservice-usercarts:50053
+      - DB_PATH=/data/orders.db
+      - NODE_ID=orders-node
+      - VOTING_PORT=50056
+      - INTRA_DECISION_PORT=50057
+
+  # ── 2PC Node 3: PARTICIPANT — Carts ─────────────────────────────────
+  # Voting phase  (port 50062): votes COMMIT if cart is non-empty
+  # Decision phase (port 50063): clears the cart on COMMIT
+  participant-carts:
+    build:
+      context: .
+      dockerfile: microservice-2pc-participant/Dockerfile
+    expose:
+      - "50062"   # voting phase
+      - "50063"   # decision phase (intra-node)
+    environment:
+      - NODE_ID=carts-node
+      - NODE_ROLE=carts
+      - VOTING_PORT=50062
+      - INTRA_PORT=50063
+
+  # ── 2PC Node 4: PARTICIPANT — Inventory ─────────────────────────────
+  # Voting phase  (port 50064): simulates inventory availability check
+  # Decision phase (port 50065): simulates reserving inventory on COMMIT
+  participant-3:
+    build:
+      context: .
+      dockerfile: microservice-2pc-participant/Dockerfile
+    expose:
+      - "50064"   # voting phase
+      - "50065"   # decision phase (intra-node)
+    environment:
+      - NODE_ID=inventory-node
+      - NODE_ROLE=inventory
+      - VOTING_PORT=50064
+      - INTRA_PORT=50065
+
+  # ── 2PC Node 5: PARTICIPANT — Payment ───────────────────────────────
+  # Voting phase  (port 50066): simulates payment authorization check
+  # Decision phase (port 50067): simulates capturing payment on COMMIT
+  participant-4:
+    build:
+      context: .
+      dockerfile: microservice-2pc-participant/Dockerfile
+    expose:
+      - "50066"   # voting phase
+      - "50067"   # decision phase (intra-node)
+    environment:
+      - NODE_ID=payment-node
+      - NODE_ROLE=payment
+      - VOTING_PORT=50066
+      - INTRA_PORT=50067
+
+  # ── Webapp ────────────────────────────────────────────────────────────
+  python-webapp:
+    build:
+      context: .
+      dockerfile: python-webapp/Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - microservice-userauth
+      - microservice-productlisting
+      - microservice-usercarts
+      - microservice-orders
+      - microservice-2pc-coordinator
+    environment:
+      - AUTH_TARGET=microservice-userauth:50051
+      - PRODUCTS_GRPC_TARGET=microservice-productlisting:50052
+      - CARTS_GRPC_TARGET=microservice-usercarts:50053
+      - ORDERS_GRPC_TARGET=microservice-orders:50054
+      - ADMIN_GRPC_TARGET=microservice-admin:50055
+      - COORDINATOR_GRPC_TARGET=microservice-2pc-coordinator:50060
+      - IMAGES_BASE=http://microservice-images

@@ -1,0 +1,29 @@
+            <div class="toolbar">
+                <label>
+                    Sort:
+                    <select id="sort">
+                        <option value="">None</option>
+                        <option value="price_asc">Price: Low → High</option>
+                        <option value="price_desc">Price: High → Low</option>
+                    </select>
+                </label>
+
+                <label>
+                    Featured only:
+                    <input id="featured" type="checkbox">
+                    </label>
+                    <label>
+                    Type:
+                    <select id="type">
+                        <option value="">All</option>
+                        <option value="compute">Compute</option>
+                        <option value="network">Network</option>
+                        <option value="gpu">GPU</option>
+                        <option value="ram">RAM</option>
+                        <option value="ssd">SSD</option> 
+                    </select>
+                </label>
+
+                <button id="refresh" type="button">Refresh</button>
+                <span id="status"></span>
+            </div>

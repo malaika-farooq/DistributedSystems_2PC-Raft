@@ -1,0 +1,6 @@
+Flask==3.0.2
+Werkzeug==3.0.1
+grpcio==1.62.2
+grpcio-tools==1.62.2
+protobuf==4.25.3
+requests==2.31.0

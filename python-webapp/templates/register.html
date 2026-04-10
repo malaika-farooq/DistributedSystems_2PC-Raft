@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+  <title>ServerShop | Register</title>
+</head>
+<body>
+  <div class="base">
+    <div class="header"><h1>Register</h1></div>
+
+    <div class="content">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div>{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" action="{{ url_for('register_post') }}">
+        <label for="user">Username:</label>
+        <input id="user" name="user" type="text" required minlength="3">
+
+        <label for="password">Password:</label>
+        <input id="password" name="password" type="password" required minlength="6">
+
+        <input type="submit" value="Create account">
+      </form>
+    </div>
+  </div>
+</body>
+</html>

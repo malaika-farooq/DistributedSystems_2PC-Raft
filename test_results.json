@@ -1,0 +1,104 @@
+[
+  {
+    "test": "Add item to cart",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "Item 1 added successfully"
+  },
+  {
+    "test": "2PC committed \u2014 all 4 participants voted COMMIT",
+    "result": "PASS",
+    "duration_ms": 323.2307434082031,
+    "detail": ""
+  },
+  {
+    "test": "Cart cleared after commit",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "Cart: 1 item(s) before \u2192 0 items after"
+  },
+  {
+    "test": "Order record saved to database",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "orders-node committed order UUID to SQLite DB"
+  },
+  {
+    "test": "Empty cart causes ABORT vote",
+    "result": "PASS",
+    "duration_ms": 82.01766014099121,
+    "detail": "orders-node checked cart \u2192 empty \u2192 voted ABORT \u2192 global ABORT"
+  },
+  {
+    "test": "No phantom order saved",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "Database unchanged \u2014 no order record created for empty cart"
+  },
+  {
+    "test": "Min latency",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "164.5 ms"
+  },
+  {
+    "test": "Max latency",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "271.8 ms"
+  },
+  {
+    "test": "Average latency",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "213.8 ms across 5 successful runs"
+  },
+  {
+    "test": "Within acceptable threshold",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "213.8 ms average < 5000 ms limit"
+  },
+  {
+    "test": "COMMIT: cart atomically cleared",
+    "result": "PASS",
+    "duration_ms": 172.52159118652344,
+    "detail": "2 items \u2192 0 in one atomic 2PC transaction"
+  },
+  {
+    "test": "COMMIT: order saved + cart cleared together",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "Both operations committed atomically \u2014 no half-done state possible"
+  },
+  {
+    "test": "ABORT: cart completely unchanged",
+    "result": "PASS",
+    "duration_ms": 8036.665916442871,
+    "detail": "Cart still has 2 item(s) \u2014 zero partial commits"
+  },
+  {
+    "test": "ABORT: no order saved",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "Database unchanged \u2014 2PC rollback worked correctly"
+  },
+  {
+    "test": "Transaction aborted when node is unreachable",
+    "result": "PASS",
+    "duration_ms": 16037.458181381226,
+    "detail": "Coordinator treated missing node as ABORT vote"
+  },
+  {
+    "test": "Cart preserved on ABORT",
+    "result": "PASS",
+    "duration_ms": null,
+    "detail": "Cart still has 1 item(s) \u2014 no partial commit"
+  },
+  {
+    "test": "System recovered after node restart",
+    "result": "PASS",
+    "duration_ms": 366.5134906768799,
+    "detail": "Transaction committed successfully after node came back"
+  }
+]

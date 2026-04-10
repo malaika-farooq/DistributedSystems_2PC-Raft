@@ -1,0 +1,56 @@
+syntax = "proto3";
+package admin;
+
+service AdminService {
+  rpc ListItems (ListItemsRequest) returns (ListItemsResponse);
+  rpc CreateItem (CreateItemRequest) returns (ItemResponse);
+  rpc UpdateItem (UpdateItemRequest) returns (ItemResponse);
+  rpc DeleteItem (DeleteItemRequest) returns (DeleteItemResponse);
+}
+
+message Item {
+  int32 id = 1;
+  string title = 2;
+  double price = 3;
+  string image_url = 4;
+  string type = 5;
+  bool is_featured = 6;
+}
+
+message ListItemsRequest {}
+
+message ListItemsResponse {
+  repeated Item items = 1;
+}
+
+message CreateItemRequest {
+  string title = 1;
+  double price = 2;
+  string image_url = 3;
+  string type = 4;
+  bool is_featured = 5;
+}
+
+message UpdateItemRequest {
+  int32 id = 1;
+  string title = 2;
+  double price = 3;
+  string image_url = 4;
+  string type = 5;
+  bool is_featured = 6;
+}
+
+message ItemResponse {
+  bool ok = 1;
+  string message = 2;
+  Item item = 3;
+}
+
+message DeleteItemRequest {
+  int32 id = 1;
+}
+
+message DeleteItemResponse {
+  bool ok = 1;
+  string message = 2;
+}

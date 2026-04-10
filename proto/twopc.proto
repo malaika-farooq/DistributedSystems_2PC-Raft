@@ -1,0 +1,112 @@
+syntax = "proto3";
+package twopc;
+
+// ──────────────────────────────────────────────
+//  Messages shared across both phases
+// ──────────────────────────────────────────────
+
+message TransactionRequest {
+  string transaction_id = 1;
+  string user_id        = 2;   // payload: whose cart / order to act on
+}
+
+// ──────────────────────────────────────────────
+//  VOTING PHASE  (Coordinator  →  Participants)
+// ──────────────────────────────────────────────
+
+message VoteRequest {
+  string transaction_id = 1;
+  string user_id        = 2;
+}
+
+message VoteResponse {
+  string transaction_id = 1;
+  string node_id        = 2;
+  bool   vote_commit    = 3;   // true = COMMIT, false = ABORT
+  string reason         = 4;
+}
+
+// ──────────────────────────────────────────────
+//  DECISION PHASE  (Coordinator  →  Participants)
+// ──────────────────────────────────────────────
+
+message GlobalDecision {
+  string transaction_id = 1;
+  bool   commit         = 2;   // true = global-commit, false = global-abort
+}
+
+message AckResponse {
+  string transaction_id = 1;
+  string node_id        = 2;
+  bool   ok             = 3;
+  string message        = 4;
+}
+
+// ──────────────────────────────────────────────
+//  INTRA-NODE communication
+//  (voting-phase sub-process  ↔  decision-phase sub-process on same node)
+// ──────────────────────────────────────────────
+
+message IntraVoteRequest {
+  string transaction_id = 1;
+  string user_id        = 2;
+}
+
+message IntraVoteResponse {
+  string transaction_id = 1;
+  bool   vote_commit    = 2;
+  string reason         = 3;
+}
+
+message IntraCommitRequest {
+  string transaction_id = 1;
+  string user_id        = 2;
+}
+
+message IntraCommitResponse {
+  string transaction_id = 1;
+  bool   ok             = 2;
+  string message        = 3;
+}
+
+message IntraAbortRequest {
+  string transaction_id = 1;
+  string user_id        = 2;
+}
+
+message IntraAbortResponse {
+  string transaction_id = 1;
+  bool   ok             = 2;
+  string message        = 3;
+}
+
+// ──────────────────────────────────────────────
+//  SERVICE DEFINITIONS
+// ──────────────────────────────────────────────
+
+// Implemented by every participant; called by the coordinator
+service ParticipantService {
+  // Voting phase: coordinator asks "can you commit?"
+  rpc RequestVote (VoteRequest) returns (VoteResponse);
+
+  // Decision phase: coordinator delivers the global verdict
+  rpc Commit (GlobalDecision) returns (AckResponse);
+  rpc Abort  (GlobalDecision) returns (AckResponse);
+}
+
+// Implemented by the coordinator; optionally called to kick off a transaction
+service CoordinatorService {
+  rpc PlaceOrderTransaction (TransactionRequest) returns (AckResponse);
+}
+
+// Intra-node: voting sub-process calls into decision sub-process
+service IntraNodeVotingService {
+  // Decision phase asks voting phase to prepare (lock resources)
+  rpc PrepareVote (IntraVoteRequest) returns (IntraVoteResponse);
+}
+
+// Intra-node: decision sub-process exposes commit/abort to voting sub-process
+service IntraNodeDecisionService {
+  rpc DoCommit (IntraCommitRequest) returns (IntraCommitResponse);
+  rpc DoAbort  (IntraAbortRequest)  returns (IntraAbortResponse);
+}

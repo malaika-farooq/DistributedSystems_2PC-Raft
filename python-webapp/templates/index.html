@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+
+{% block title %}ServerShop | Home{% endblock %}
+{% block content %} {% include "_featuredcontent.html" %} {% endblock %}
+{% block left %} {% include "_productlist.html" %} {% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/products.js') }}"></script>{% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+  <title>ServerShop | Admin</title>
+</head>
+<body>
+  <div class="base">
+    <div class="header">
+      <h1>Admin</h1>
+      <div class="user-area" style="margin-left:auto;">
+        <span>Logged in as {{ session['user'] }}</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <h2>Create / Edit Product</h2>
+      <div class="toolbar">
+        <input id="title" placeholder="Title">
+        <input id="price" placeholder="Price" type="number" step="0.01" min="0">
+        <input id="image_url" placeholder="Image URL">
+        <input id="type" placeholder="Type (e.g. hosting)">
+        <label><input id="is_featured" type="checkbox"> Featured</label>
+        <button id="save" type="button">Save</button>
+        <button id="clear" type="button">Clear</button>
+        <span id="status"></span>
+      </div>
+
+      <h2>Products</h2>
+      <div id="grid" class="grid"></div>
+    </div>
+
+    <div class="right"></div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>
