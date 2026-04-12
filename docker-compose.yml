@@ -157,6 +157,71 @@ services:
       - VOTING_PORT=50066
       - INTRA_PORT=50067
 
+  # ══════════════════════════════════════════════════════════════════════════════
+  #  Raft cluster — 5 nodes (Q3: leader election, Q4: log replication)
+  #
+  #  All nodes listen on port 50070 internally.
+  #  raft-node-1 is also exposed on host port 50170 for test scripts.
+  #
+  #  Heartbeat timeout : 1 second
+  #  Election timeout  : random [1.5 s, 3.0 s] per node
+  # ══════════════════════════════════════════════════════════════════════════════
+
+  raft-node-1:
+    build:
+      context: .
+      dockerfile: microservice-raft/Dockerfile
+    ports:
+      - "50170:50070"   # exposed to host for test scripts
+    environment:
+      - NODE_ID=raft-node-1
+      - RAFT_PORT=50070
+      - PEER_ADDRS=raft-node-2:50070,raft-node-3:50070,raft-node-4:50070,raft-node-5:50070
+
+  raft-node-2:
+    build:
+      context: .
+      dockerfile: microservice-raft/Dockerfile
+    expose:
+      - "50070"
+    environment:
+      - NODE_ID=raft-node-2
+      - RAFT_PORT=50070
+      - PEER_ADDRS=raft-node-1:50070,raft-node-3:50070,raft-node-4:50070,raft-node-5:50070
+
+  raft-node-3:
+    build:
+      context: .
+      dockerfile: microservice-raft/Dockerfile
+    expose:
+      - "50070"
+    environment:
+      - NODE_ID=raft-node-3
+      - RAFT_PORT=50070
+      - PEER_ADDRS=raft-node-1:50070,raft-node-2:50070,raft-node-4:50070,raft-node-5:50070
+
+  raft-node-4:
+    build:
+      context: .
+      dockerfile: microservice-raft/Dockerfile
+    expose:
+      - "50070"
+    environment:
+      - NODE_ID=raft-node-4
+      - RAFT_PORT=50070
+      - PEER_ADDRS=raft-node-1:50070,raft-node-2:50070,raft-node-3:50070,raft-node-5:50070
+
+  raft-node-5:
+    build:
+      context: .
+      dockerfile: microservice-raft/Dockerfile
+    expose:
+      - "50070"
+    environment:
+      - NODE_ID=raft-node-5
+      - RAFT_PORT=50070
+      - PEER_ADDRS=raft-node-1:50070,raft-node-2:50070,raft-node-3:50070,raft-node-4:50070
+
   # ── Webapp ────────────────────────────────────────────────────────────
   python-webapp:
     build:

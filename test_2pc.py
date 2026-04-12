@@ -120,26 +120,28 @@ def place_order(s):
 
 # ── Docker helpers ────────────────────────────────────────────────────────────
 
-def docker_stop(container):
+def docker_stop(service):
+    """Stop a service using docker compose (service name, not container name)."""
     try:
-        subprocess.run(["docker", "stop", container],
+        subprocess.run(["docker", "compose", "stop", service],
                        capture_output=True, timeout=20, check=True)
-        info(f"Stopped {container}")
+        info(f"Stopped {service}")
         return True
     except Exception as e:
-        info(f"Could not stop {container} automatically: {e}")
+        info(f"Could not stop {service} automatically: {e}")
         return False
 
 
-def docker_start(container):
+def docker_start(service):
+    """Start a service using docker compose (service name, not container name)."""
     try:
-        subprocess.run(["docker", "start", container],
+        subprocess.run(["docker", "compose", "start", service],
                        capture_output=True, timeout=20, check=True)
-        info(f"Started {container}")
+        info(f"Started {service}")
         time.sleep(4)   # Wait for gRPC servers to be ready
         return True
     except Exception as e:
-        info(f"Could not start {container} automatically: {e}")
+        info(f"Could not start {service} automatically: {e}")
         return False
 
 
@@ -204,7 +206,7 @@ def test2_node_failure():
     info(f"Cart has {n_before} item(s)")
 
     info("Stopping inventory-node (participant-3) ...")
-    docker_stop("project2-main-participant-3-1")
+    docker_stop("participant-3")
     time.sleep(2)
 
     info("Placing order with node DOWN — should ABORT...")
@@ -227,7 +229,7 @@ def test2_node_failure():
                   "Transaction committed despite missing participant", ms)
 
     info("Restarting inventory-node ...")
-    docker_start("project2-main-participant-3-1")
+    docker_start("participant-3")
 
     info("Placing order again to verify recovery...")
     data2, ms2 = place_order(s)
@@ -340,11 +342,11 @@ def test5_atomicity():
     n_before2 = len(get_cart(s).get("items", []))
     info(f"Cart has {n_before2} item(s) before abort test")
 
-    docker_stop("project2-main-participant-4-1")
+    docker_stop("participant-4")
     time.sleep(2)
 
     data2, ms2 = place_order(s)
-    docker_start("project2-main-participant-4-1")
+    docker_start("participant-4")
 
     if not data2.get("ok"):
         n_after2 = len(get_cart(s).get("items", []))

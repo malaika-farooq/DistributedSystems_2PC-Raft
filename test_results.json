@@ -8,7 +8,7 @@
   {
     "test": "2PC committed \u2014 all 4 participants voted COMMIT",
     "result": "PASS",
-    "duration_ms": 323.2307434082031,
+    "duration_ms": 61.70177459716797,
     "detail": ""
   },
   {
@@ -26,7 +26,7 @@
   {
     "test": "Empty cart causes ABORT vote",
     "result": "PASS",
-    "duration_ms": 82.01766014099121,
+    "duration_ms": 48.18892478942871,
     "detail": "orders-node checked cart \u2192 empty \u2192 voted ABORT \u2192 global ABORT"
   },
   {
@@ -39,30 +39,30 @@
     "test": "Min latency",
     "result": "PASS",
     "duration_ms": null,
-    "detail": "164.5 ms"
+    "detail": "56.5 ms"
   },
   {
     "test": "Max latency",
     "result": "PASS",
     "duration_ms": null,
-    "detail": "271.8 ms"
+    "detail": "74.7 ms"
   },
   {
     "test": "Average latency",
     "result": "PASS",
     "duration_ms": null,
-    "detail": "213.8 ms across 5 successful runs"
+    "detail": "62.5 ms across 5 successful runs"
   },
   {
     "test": "Within acceptable threshold",
     "result": "PASS",
     "duration_ms": null,
-    "detail": "213.8 ms average < 5000 ms limit"
+    "detail": "62.5 ms average < 5000 ms limit"
   },
   {
     "test": "COMMIT: cart atomically cleared",
     "result": "PASS",
-    "duration_ms": 172.52159118652344,
+    "duration_ms": 59.9517822265625,
     "detail": "2 items \u2192 0 in one atomic 2PC transaction"
   },
   {
@@ -74,7 +74,7 @@
   {
     "test": "ABORT: cart completely unchanged",
     "result": "PASS",
-    "duration_ms": 8036.665916442871,
+    "duration_ms": 66.69998168945312,
     "detail": "Cart still has 2 item(s) \u2014 zero partial commits"
   },
   {
@@ -86,7 +86,7 @@
   {
     "test": "Transaction aborted when node is unreachable",
     "result": "PASS",
-    "duration_ms": 16037.458181381226,
+    "duration_ms": 80.57999610900879,
     "detail": "Coordinator treated missing node as ABORT vote"
   },
   {
@@ -98,7 +98,7 @@
   {
     "test": "System recovered after node restart",
     "result": "PASS",
-    "duration_ms": 366.5134906768799,
+    "duration_ms": 71.63190841674805,
     "detail": "Transaction committed successfully after node came back"
   }
 ]
