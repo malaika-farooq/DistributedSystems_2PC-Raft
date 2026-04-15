@@ -13,8 +13,9 @@ All inter-node communication uses **gRPC**. Every node runs as a separate **Dock
 
 | Name | Student ID |
 |------|-----------|
-| Malaika Farooq | 1002311562 |
-| Yuanbin Man | 1002296616 |
+Malaika Farooq 1002311562 2PC implementation (Q1 & Q2), containerization, testing, report
+Yuanbin Man 1002296616 Raft implementation (Q3 & Q4), test cases (Q5), testing, report
+
 
 **GitHub**: https://github.com/malaika-farooq/DistributedSystems_2PC-Raft
 
